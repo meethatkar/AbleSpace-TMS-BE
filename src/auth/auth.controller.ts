@@ -8,14 +8,47 @@ import {
   Delete,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Post('guest')
-  create() {
-    return this.authService.create();
+  async create() {
+    const guestUser = await this.authService.create();
+
+    const payload = {
+      sub: guestUser._id,
+      role: guestUser.role,
+      username: guestUser.username,
+    };
+
+    const access_token = await this.jwtService.signAsync(payload);
+    return {
+      message: 'Guest loggedIn successfully',
+      access_token: access_token,
+      user: guestUser,
+    };
+  }
+  @Post('googleAuth')
+  async googleAuth(@Body('token') token: string) {
+    const userData = await this.authService.googleLogin(token);
+    const payload = {
+      sub: userData._id,
+      role: userData.role,
+      username: userData.username,
+    };
+
+    const access_token = await this.jwtService.signAsync(payload);
+    return {
+      message: 'Google Auth Login successfully',
+      access_token: access_token,
+      user: userData,
+    };
   }
 
   @Get()

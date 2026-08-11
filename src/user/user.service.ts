@@ -1,15 +1,22 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schema/user.schema';
+import { OAuth2Client } from 'google-auth-library';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
+  private googleClient: OAuth2Client;
+
   constructor(
-    private readonly jwtService: JwtService,
     @InjectModel(User.name) private readonly userModel: Model<User>,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.googleClient = new OAuth2Client(
+      this.configService.get<string>('GOOGLE_CLIENT_ID'),
+    );
+  }
 
   async guestLogin() {
     try {
@@ -21,20 +28,45 @@ export class UserService {
         role: 'Guest',
       });
 
-      const payload = {
-        sub: guestUser._id,
-        role: guestUser.role,
-        username: guestUser.username,
-      };
-
-      const token = await this.jwtService.signAsync(payload);
-      return {
-        message: 'Guest loggedIn successfully',
-        access_token: token,
-        user: guestUser,
-      };
+      return guestUser;
     } catch (error) {
       console.log('ERROR: ', error);
+      throw error;
+    }
+  }
+
+  async googleLogin(id: string) {
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken: id,
+        // audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+      });
+      const payload = ticket.getPayload();
+      console.log('PAYLOAD:: ', payload);
+
+      if (!payload || !payload.email) {
+        throw new UnauthorizedException('Invaild Google Token');
+      }
+
+      const { email, name, picture } = payload;
+
+      let user = await this.userModel.findOne({ email });
+
+      if (!user) {
+        const randomSuffix = Math.floor(100 + Math.random() * 900);
+        const username = email.split('@')[0] + '_' + randomSuffix;
+        user = await this.userModel.create({
+          fullName: name || 'Google User ' + randomSuffix,
+          username,
+          email,
+          role: 'User',
+          profileImg: picture || '',
+        });
+      }
+
+      return user;
+    } catch (error) {
+      console.log('Error in google Auth: ', error);
       throw error;
     }
   }
