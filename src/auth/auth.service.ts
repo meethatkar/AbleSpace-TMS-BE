@@ -4,8 +4,13 @@ import { UserService } from 'src/user/user.service';
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UserService) {}
-  create() {
-    const userData = this.userService.guestLogin();
+  async create() {
+    const userData = await this.userService.guestLogin();
+    return userData;
+  }
+
+  async googleLogin(token: string) {
+    const userData = await this.userService.googleLogin(token);
     return userData;
   }
 
