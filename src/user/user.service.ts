@@ -42,7 +42,6 @@ export class UserService {
         // audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
       });
       const payload = ticket.getPayload();
-      console.log('PAYLOAD:: ', payload);
 
       if (!payload || !payload.email) {
         throw new UnauthorizedException('Invaild Google Token');
@@ -60,7 +59,7 @@ export class UserService {
           username,
           email,
           role: 'User',
-          profileImg: picture || '',
+          profileImg: picture,
         });
       }
 
