@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import * as mongoose from 'mongoose';
 import { Types } from 'mongoose';
 import { User } from 'src/user/schema/user.schema';
 
@@ -13,13 +14,17 @@ export class Task {
   @Prop({ required: true })
   status: string;
 
-  @Prop({ type: Types.ObjectId, required: true, ref: User.name })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: User.name,
+  })
   reporter: Types.ObjectId;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: User.name }] })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }] })
   members: Types.ObjectId[];
 
-  @Prop({ type: Types.ObjectId, ref: User.name }) //todo: Teams model
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name }) //todo: Teams model
   teams: Types.ObjectId;
 
   @Prop()
@@ -34,7 +39,7 @@ export class Task {
   @Prop()
   updates: string;
 
-  @Prop({ type: Types.ObjectId, ref: User.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
   updatedBy: Types.ObjectId;
 }
 
