@@ -33,8 +33,7 @@ export class CreateTaskDto {
   teamId?: string;
 
   @IsString()
-  @IsOptional()
-  dueDate?: string;
+  dueDate: string;
 
   @IsString()
   @IsOptional()
