@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import type { Request } from 'express';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './schema/user.schema';
@@ -66,6 +67,19 @@ export class UserService {
       return user;
     } catch (error) {
       console.log('Error in google Auth: ', error);
+      throw error;
+    }
+  }
+
+  async getUser(req: Request) {
+    const id = req.user?.sub;
+    if (!id) {
+      throw new UnauthorizedException('User ID not found in token');
+    }
+    try {
+      return await this.userModel.findById(id);
+    } catch (error) {
+      console.log('Error in GetMe: ', error);
       throw error;
     }
   }
