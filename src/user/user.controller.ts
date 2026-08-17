@@ -1,4 +1,4 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Req } from '@nestjs/common';
 import type { Request } from 'express';
 import { UserService } from './user.service';
 
@@ -9,5 +9,10 @@ export class UserController {
   @Get()
   getMe(@Req() req: Request) {
     return this.userService.getUser(req);
+  }
+
+  @Patch()
+  updateEmail(@Req() req: Request, @Body('email') email: string) {
+    return this.userService.updateEmail(req, email);
   }
 }
