@@ -24,10 +24,11 @@ export class Task {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }] })
   members: Types.ObjectId[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name }) //todo: Teams model
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+  //todo: Teams model [add later on for premium customers ,afterward you have learn payment integration]
   teams: Types.ObjectId;
 
-  @Prop()
+  @Prop({ required: true })
   dueDate: string;
 
   @Prop()
