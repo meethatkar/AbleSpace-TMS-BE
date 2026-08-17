@@ -83,4 +83,21 @@ export class UserService {
       throw error;
     }
   }
+
+  async updateEmail(req: Request, updatedEmail: string) {
+    const id = req.user?.sub;
+    if (!id) {
+      throw new UnauthorizedException('User ID not found in token');
+    }
+    try {
+      return await this.userModel.findByIdAndUpdate(
+        id,
+        { email: updatedEmail },
+        { new: true },
+      );
+    } catch (error) {
+      console.log('Error in updateEmail: ', error);
+      throw error;
+    }
+  }
 }
