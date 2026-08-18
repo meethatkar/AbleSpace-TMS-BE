@@ -27,12 +27,12 @@ export class ProjectService {
 
   async findAll() {
     try {
-      return await this.projectModel
+      const data = await this.projectModel
         .find()
         .populate('lead', 'username fullName email profileImg')
-        .populate('reporter', 'username fullName email profileImg')
         .populate('members', 'username fullName email profileImg')
         .exec();
+      return data;
     } catch {
       throw new HttpException(
         'Failed to fetch projects',

@@ -16,13 +16,14 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectService.create(createProjectDto);
+  async create(@Body() createProjectDto: CreateProjectDto) {
+    return await this.projectService.create(createProjectDto);
   }
 
   @Get()
-  findAll() {
-    return this.projectService.findAll();
+  async findAll() {
+    const response = await this.projectService.findAll();
+    return response;
   }
 
   @Get(':id')
